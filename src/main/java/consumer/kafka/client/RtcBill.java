@@ -28,6 +28,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.VoidFunction;
+import org.apache.spark.rdd.RDD;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaDStream;
@@ -36,7 +37,6 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
-
 
 import consumer.kafka.MessageAndMetadata;
 import consumer.kafka.ProcessedOffsetManager;
@@ -53,7 +53,6 @@ public class RtcBill implements Serializable {
     run();
   }
 
-  @SuppressWarnings("deprecation")
   private void run() {
     logger.info("in RtcBill run()");
 
@@ -62,14 +61,14 @@ public class RtcBill implements Serializable {
     props.put("zookeeper.port", "2181");
     props.put("kafka.topic", "bill-test");
     props.put("kafka.consumer.id", "bill-kafka-consumer");
-    // Optional Properties
+
     // Optional Properties
     props.put("consumer.forcefromstart", "true");
 //    props.put("max.poll.records", "100");
       props.put("max.poll.records", "1");
     props.put("consumer.fillfreqms", "1000");
 //    props.put("consumer.backpressure.enabled", "true");
-      props.put("consumer.backpressure.enabled", "false");
+    props.put("consumer.backpressure.enabled", "false");
 
     //Kafka properties
     props.put("bootstrap.servers", "10.25.16.164:9092,10.25.22.115:9092,10.25.21.72:9092");
@@ -78,12 +77,11 @@ public class RtcBill implements Serializable {
 //    props.put("ssl.truststore.password", "test1234");
 
     SparkConf _sparkConf = new SparkConf();
-      JavaSparkContext sparkContext = new JavaSparkContext(_sparkConf);
-//      JavaStreamingContext jsc = new JavaStreamingContext(_sparkConf, Durations.seconds(30));
-      JavaStreamingContext jsc = new JavaStreamingContext(sparkContext, Durations.seconds(30));
-      SQLContext sqlContext = new SQLContext(sparkContext);
-    // Specify number of Receivers you need.
-    int numberOfReceivers = 1;
+    JavaSparkContext sparkContext = new JavaSparkContext(_sparkConf);
+    JavaStreamingContext jsc = new JavaStreamingContext(sparkContext, Durations.seconds(30));
+    SQLContext sqlContext = new SQLContext(sparkContext);
+
+    int numberOfReceivers = 3;
 
     JavaDStream<MessageAndMetadata<byte[]>> unionStreams = ReceiverLauncher.launch(
         jsc, props, numberOfReceivers, StorageLevel.MEMORY_ONLY());
@@ -92,42 +90,48 @@ public class RtcBill implements Serializable {
     JavaPairDStream<Integer, Iterable<Long>> partitonOffset = ProcessedOffsetManager
         .getPartitionOffset(unionStreams, props);
 
-    //Start Application Logic
     unionStreams.foreachRDD(new VoidFunction<JavaRDD<MessageAndMetadata<byte[]>>>() {
       @Override
       public void call(JavaRDD<MessageAndMetadata<byte[]>> rdd) throws Exception {
-//        new DataAccess( ).insert1(rdd.rdd(),_sparkConf);
+          RDD<MessageAndMetadata<byte[]>> rdd1 = rdd.rdd();
+//          new DataAccess( ).insert1(rdd.rdd(),_sparkConf);
 //          new DataAccess( ).insert1(rdd.rdd(),JavaSparkContext.toSparkContext(sparkContext));
-          List<Row> rowList1 = new ArrayList<>();
-          new DataAccess( ).insert1(rowList1,"123","321",sqlContext);
+////          List<Row> rowList1 = new ArrayList<>();
+////          new DataAccess( ).insertdb(rowList1,"123","321",sqlContext);
 
-    	rdd.foreachPartition(new VoidFunction<Iterator<MessageAndMetadata<byte[]>>>() {
-			
+//          MessageAndMetadata<byte[]>[] collect = rdd1.collect();
+          //scala.collection.Iterator<MessageAndMetadata<byte[]>> iterator = rdd1.iterator();
+//          MessageAndMetadata<byte[]>[] take = rdd1.take(1);
+
+          rdd.foreachPartition(new VoidFunction<Iterator<MessageAndMetadata<byte[]>>>() {
+
 			@Override
 			public void call(Iterator<MessageAndMetadata<byte[]>> mmItr) throws Exception {
+
+                List<Row> rowList = new ArrayList<>();
+
 				while(mmItr.hasNext()) {
 					MessageAndMetadata<byte[]> mm = mmItr.next();
 					byte[] key = mm.getKey();
 					byte[] value = mm.getPayload();
 					Headers headers = mm.getHeaders();
-					if(key != null)
-//						System.out.println(" key :" + new String(key));
+					if(key != null) {
                         logger.info(" key :" + new String(key));
-					if(value != null)
-//						System.out.println(" Value :" + new String(value));
+                        new DataAccess().insertdb(rowList, new String(key), "defautlValue", sqlContext);
+                    }
+					if(value != null) {
                         logger.info(" Value :" + new String(value));
-
+                        new DataAccess().insertdb(rowList, "defautlKey", new String(value), sqlContext);
+                    }
                     ///
                     if(key != null&& value != null) {
 
                         logger.info(" key :" + new String(key));
                         logger.info(" Value :" + new String(value));
 
-                        List<Row> rowList = new ArrayList<>();
-
 //                        new DataAccess( ).insert1(new String(key),new String(value),JavaSparkContext.toSparkContext(sparkContext));
 //                        new DataAccess( ).insert1(rowList,new String(key),new String(value),JavaSparkContext.toSparkContext(sparkContext));
-                        new DataAccess( ).insert1(rowList,new String(key),new String(value),sqlContext);
+                        new DataAccess( ).insertdb(rowList,new String(key),new String(value),sqlContext);
                     }
                     ///
 					if(headers != null) {
@@ -140,14 +144,11 @@ public class RtcBill implements Serializable {
                                 logger.info("Header Key :" + hkey + " Header Value :" + new String(hvalue));
 						}
 					}
-					
 				}
-				
 			}
 		});
       }
     });
-    //End Application Logic
 
     //Persists the Max Offset of given Kafka Partition to ZK
     ProcessedOffsetManager.persists(partitonOffset, props);
@@ -166,51 +167,4 @@ public class RtcBill implements Serializable {
     RtcBill consumer = new RtcBill();
     consumer.start();
   }
-
-//  public static void writeToDB(String[] args) {
-//        JavaSparkContext sparkContext = new JavaSparkContext(new SparkConf().setAppName("SparkMysql").setMaster("local[5]"));
-//        SQLContext sqlContext = new SQLContext(sparkContext);
-//
-//      //Arrays.asList("1 tom 5","2 jack 6","3 alex 7");
-//      List strings = new ArrayList<>();
-
-//        JavaRDD<String> personData = sparkContext.parallelize(strings);
-
-//        String url = "jdbc:mysql://localhost:3306/test";
-//        Properties connectionProperties = new Properties();
-//        connectionProperties.put("user","root");
-//        connectionProperties.put("password","123456");
-//        connectionProperties.put("driver","com.mysql.jdbc.Driver");
-
-
-//      JavaRDD<Row> personsRDD = personData.map(new Function<String,Row>(){
-//          public Row call(String line) throws Exception {
-//              String[] splited = line.split(" ");
-//              return RowFactory.create(Integer.valueOf(splited[0]),
-//                      splited[1],
-//                      Integer.valueOf(splited[2]));
-//          }
-//      });
-//
-//
-//
-//
-
-//        List structFields = new ArrayList();
-//        structFields.add(DataTypes.createStructField("id",DataTypes.IntegerType,true));
-//        structFields.add(DataTypes.createStructField("name",DataTypes.StringType,true));
-//        structFields.add(DataTypes.createStructField("age",DataTypes.IntegerType,true));
-//
-
-//        StructType structType = DataTypes.createStructType(structFields);
-//
-
-//        DataFrame personsDF = sqlContext.createDataFrame(personsRDD,structType);
-//
-
-//        personsDF.write().mode("append").jdbc(url,"person",connectionProperties);
-//
-
-//        sparkContext.stop();
-//    }
 }

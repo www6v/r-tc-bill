@@ -60,9 +60,6 @@ object LowLevelKafkaConsumer {
     ProcessedOffsetManager.persists(partitonOffset_stream, props)
     ssc.start()
     ssc.awaitTermination()
-
-
   }
-
 }
 
