@@ -10,7 +10,7 @@ import org.apache.spark.sql.types._
 class DataAccess {
 
 //  def insertdb(rdd : RDD[MessageAndMetadata[Array[Byte]]], key:String, value:String, sqlContext:SQLContext ): Unit = {
-  def insertdb(rows : java.util.List[Row], key:String, value:String, sqlContext:SQLContext ): Unit = {
+  def insertdb(rows : java.util.List[Row], key:String, value:Integer, sqlContext:SQLContext ): Unit = {
     val connectionProperties = new Properties();
     connectionProperties.put("user","root");
     connectionProperties.put("password","1qaZxsw23edcvfr4");
@@ -18,7 +18,7 @@ class DataAccess {
 
     val url = "jdbc:mysql://10.25.29.26:3306/test";
 
-    rows.add(Row( key , 11 ));
+    rows.add(Row( key , value ));
 
     val schame= StructType(
       StructField("name",StringType,true)::
