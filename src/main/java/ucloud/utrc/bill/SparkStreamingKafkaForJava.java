@@ -1,21 +1,21 @@
-package consumer.kafka.test;
+package ucloud.utrc.bill;
 
 import java.util.*;
 import org.apache.spark.SparkConf;
-import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.*;
-import org.apache.spark.api.java.function.*;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SQLContext;
 import org.apache.spark.streaming.Durations;
-import org.apache.spark.streaming.StreamingContext;
 import org.apache.spark.streaming.api.java.*;
 import org.apache.spark.streaming.kafka010.*;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
+
+import consumer.kafka.client.DataAccess;
 
 public class SparkStreamingKafkaForJava {
 
@@ -23,11 +23,13 @@ public class SparkStreamingKafkaForJava {
 
      public static void main(String args[]) {
 
+         DataAccess dataAccess = new DataAccess();
+
          SparkConf _sparkConf= new SparkConf();
 //         val sparkContext: SparkContext = new SparkContext(_sparkConf)
          JavaSparkContext sparkContext= new JavaSparkContext(_sparkConf);
          JavaStreamingContext streamingContext= new JavaStreamingContext(sparkContext, Durations.seconds(30));
-
+         SQLContext sqlContext = new SQLContext(sparkContext);
 
          Map<String, Object> kafkaParams = new HashMap<>();
          kafkaParams.put("bootstrap.servers", "10.25.16.164:9092,10.25.22.115:9092,10.25.21.72:9092");
@@ -77,6 +79,9 @@ public class SparkStreamingKafkaForJava {
                      System.out.print("value:" + value);
                      logger.info("key:" + key);
                      logger.info("value:" + value);
+
+                     List<Row> rowList1 = new ArrayList<>();
+                     dataAccess.insertdb( rowList1, key, 890,sqlContext );
                  }
              });
          });

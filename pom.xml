@@ -247,7 +247,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <!--<mainClass>consumer.kafka.client.RtcBill</mainClass>-->
-              <mainClass>consumer.kafka.test.SparkStreamingKafkaForJava</mainClass>
+              <mainClass>ucloud.utrc.bill.SparkStreamingKafkaForJava</mainClass>
             </manifest>
           </archive>
         </configuration>

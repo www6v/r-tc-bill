@@ -1,4 +1,4 @@
-package consumer.kafka.test
+package ucloud.utrc.bill
 
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.apache.spark.api.java.JavaSparkContext

@@ -7,7 +7,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 import org.apache.spark.sql.types._
 
-class DataAccess {
+class DataAccess extends Serializable {
 
 //  def insertdb(rdd : RDD[MessageAndMetadata[Array[Byte]]], key:String, value:String, sqlContext:SQLContext ): Unit = {
   def insertdb(rows : java.util.List[Row], key:String, value:Integer, sqlContext:SQLContext ): Unit = {
