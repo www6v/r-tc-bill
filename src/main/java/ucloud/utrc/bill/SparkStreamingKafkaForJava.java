@@ -4,6 +4,7 @@ import java.util.*;
 import org.apache.spark.SparkConf;
 import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.*;
+import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
 import org.apache.spark.streaming.Durations;
@@ -29,7 +30,7 @@ public class SparkStreamingKafkaForJava {
 //         val sparkContext: SparkContext = new SparkContext(_sparkConf)
          JavaSparkContext sparkContext= new JavaSparkContext(_sparkConf);
          JavaStreamingContext streamingContext= new JavaStreamingContext(sparkContext, Durations.seconds(30));
-         SQLContext sqlContext = new SQLContext(sparkContext);
+//         SQLContext sqlContext = new SQLContext(sparkContext);
 
          Map<String, Object> kafkaParams = new HashMap<>();
          kafkaParams.put("bootstrap.servers", "10.25.16.164:9092,10.25.22.115:9092,10.25.21.72:9092");
@@ -64,11 +65,38 @@ public class SparkStreamingKafkaForJava {
          );
 
          stream.foreachRDD(rdd -> {
+//             SQLContext sqlContext = SQLContext.getOrCreate(rdd.context());
+//             List<Row> rowList1 = new ArrayList<>();
+//             dataAccess.insertdb( rowList1, "abc", 109,sqlContext);
+
+//             List<ConsumerRecord<String, String>> collect = rdd.collect();
+//             Iterator<ConsumerRecord<String, String>> iterator = collect.iterator();
+//             while( iterator.hasNext()) {
+//                 ConsumerRecord<String, String> next = iterator.next();
+//                 String key = next.key();
+//                 String value = next.value();
+//                 dataAccess.insertdb( rowList1, key, 509,sqlContext);
+//             }
+
+             rdd.foreach(new VoidFunction<ConsumerRecord<String, String>>() {
+                 @Override
+                 public void call(ConsumerRecord<String, String> stringStringConsumerRecord) throws Exception {
+//                     dataAccess.insertdb( rowList1, stringStringConsumerRecord.key(), 509,sqlContext);
+                 }
+             });
+
              OffsetRange[] offsetRanges = ((HasOffsetRanges) rdd.rdd()).offsetRanges();
              rdd.foreachPartition(consumerRecords -> {
+//                 SQLContext sqlContext = SQLContext.getOrCreate(rdd.context());// 不能在这里
+
                  OffsetRange o = offsetRanges[TaskContext.get().partitionId()];
-                 System.out.println(
-                         o.topic() + " " + o.partition() + " " + o.fromOffset() + " " + o.untilOffset());
+                 System.out.println( "o.topic(): " + o.topic()
+                         + "o.partition(): " + o.partition()
+                         + "o.fromOffset() " + o.fromOffset()
+                         + "o.untilOffset() " + o.untilOffset());
+
+//                 List<Row> rowList1 = new ArrayList<>();
+//                 dataAccess.insertdb( rowList1, "ttt", 111 ,sqlContext );
 
                  if(consumerRecords.hasNext()){
                      ConsumerRecord<String, String> next = consumerRecords.next();
@@ -78,19 +106,31 @@ public class SparkStreamingKafkaForJava {
                      if(key!=null){
                          System.out.println("key:" + key);
                          logger.info("key:" + key);
-
-                         List<Row> rowList1 = new ArrayList<>();
-                         dataAccess.insertdb( rowList1, key, 109,sqlContext );
                      }
                      if(value!=null){
                          System.out.println("value:" + value);
                          logger.info("value:" + value);
-                         List<Row> rowList1 = new ArrayList<>();
-                         dataAccess.insertdb( rowList1, value, 890,sqlContext );
                      }
+                     Temp.insertDB(key, 345);
+//                     List<Row> rowList1 = new ArrayList<>();
+//                     dataAccess.insertdb( rowList1, key, 111 ,sqlContext );
                  }
              });
          });
+
+
+
+         stream.foreachRDD ( rdd -> {
+                     rdd.foreachPartition(partitionOfRecords -> {
+//                 // ConnectionPool is a static, lazily initialized pool of connections
+//                 Connection connection = ConnectionPool.getConnection();
+//                 partitionOfRecords.foreach(record -> connection.send(record));
+//                 ConnectionPool.returnConnection(connection);  // return to the pool for future reuse
+
+                         partitionOfRecords.hasNext();
+                     });
+                 });
+
 
          stream.foreachRDD(rdd -> {
              OffsetRange[] offsetRanges = ((HasOffsetRanges) rdd.rdd()).offsetRanges();
