@@ -2,11 +2,10 @@ package ucloud.utrc.bill;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class Temp {
+public class DbStore {
 
     public static void main(String[] args) {
         insertDB("123", 579);
@@ -22,10 +21,7 @@ public class Temp {
         try {
             Class.forName(driver);
             con = DriverManager.getConnection(url,user,password);
-//            if(!con.isClosed())
-//                System.out.println("Succeeded connecting to the Database!");
             Statement statement = con.createStatement();
-//            String sql = "select * from person";
             String sql = "INSERT INTO person (name, age) VALUES ('"+ key +"', "+ value +")";
             int i = statement.executeUpdate(sql);
 

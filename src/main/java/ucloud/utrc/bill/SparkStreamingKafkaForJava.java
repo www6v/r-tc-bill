@@ -4,9 +4,6 @@ import java.util.*;
 import org.apache.spark.SparkConf;
 import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.*;
-import org.apache.spark.api.java.function.VoidFunction;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SQLContext;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.*;
 import org.apache.spark.streaming.kafka010.*;
@@ -16,18 +13,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
-import consumer.kafka.client.DataAccess;
-
 public class SparkStreamingKafkaForJava {
 
     private  final static Logger logger = LoggerFactory.getLogger(SparkStreamingKafkaForJava.class);
 
      public static void main(String args[]) {
 
-         DataAccess dataAccess = new DataAccess();
-
          SparkConf _sparkConf= new SparkConf();
-//         val sparkContext: SparkContext = new SparkContext(_sparkConf)
          JavaSparkContext sparkContext= new JavaSparkContext(_sparkConf);
          JavaStreamingContext streamingContext= new JavaStreamingContext(sparkContext, Durations.seconds(30));
 //         SQLContext sqlContext = new SQLContext(sparkContext);
@@ -65,38 +57,14 @@ public class SparkStreamingKafkaForJava {
          );
 
          stream.foreachRDD(rdd -> {
-//             SQLContext sqlContext = SQLContext.getOrCreate(rdd.context());
-//             List<Row> rowList1 = new ArrayList<>();
-//             dataAccess.insertdb( rowList1, "abc", 109,sqlContext);
-
-//             List<ConsumerRecord<String, String>> collect = rdd.collect();
-//             Iterator<ConsumerRecord<String, String>> iterator = collect.iterator();
-//             while( iterator.hasNext()) {
-//                 ConsumerRecord<String, String> next = iterator.next();
-//                 String key = next.key();
-//                 String value = next.value();
-//                 dataAccess.insertdb( rowList1, key, 509,sqlContext);
-//             }
-
-             rdd.foreach(new VoidFunction<ConsumerRecord<String, String>>() {
-                 @Override
-                 public void call(ConsumerRecord<String, String> stringStringConsumerRecord) throws Exception {
-//                     dataAccess.insertdb( rowList1, stringStringConsumerRecord.key(), 509,sqlContext);
-                 }
-             });
-
              OffsetRange[] offsetRanges = ((HasOffsetRanges) rdd.rdd()).offsetRanges();
              rdd.foreachPartition(consumerRecords -> {
-//                 SQLContext sqlContext = SQLContext.getOrCreate(rdd.context());// 不能在这里
 
                  OffsetRange o = offsetRanges[TaskContext.get().partitionId()];
                  System.out.println( "o.topic(): " + o.topic()
                          + "o.partition(): " + o.partition()
                          + "o.fromOffset() " + o.fromOffset()
                          + "o.untilOffset() " + o.untilOffset());
-
-//                 List<Row> rowList1 = new ArrayList<>();
-//                 dataAccess.insertdb( rowList1, "ttt", 111 ,sqlContext );
 
                  if(consumerRecords.hasNext()){
                      ConsumerRecord<String, String> next = consumerRecords.next();
@@ -111,14 +79,10 @@ public class SparkStreamingKafkaForJava {
                          System.out.println("value:" + value);
                          logger.info("value:" + value);
                      }
-                     Temp.insertDB(key, 345);
-//                     List<Row> rowList1 = new ArrayList<>();
-//                     dataAccess.insertdb( rowList1, key, 111 ,sqlContext );
+                     DbStore.insertDB(key, 345);
                  }
              });
          });
-
-
 
          stream.foreachRDD ( rdd -> {
                      rdd.foreachPartition(partitionOfRecords -> {
@@ -126,11 +90,8 @@ public class SparkStreamingKafkaForJava {
 //                 Connection connection = ConnectionPool.getConnection();
 //                 partitionOfRecords.foreach(record -> connection.send(record));
 //                 ConnectionPool.returnConnection(connection);  // return to the pool for future reuse
-
-                         partitionOfRecords.hasNext();
                      });
                  });
-
 
          stream.foreachRDD(rdd -> {
              OffsetRange[] offsetRanges = ((HasOffsetRanges) rdd.rdd()).offsetRanges();
@@ -138,7 +99,6 @@ public class SparkStreamingKafkaForJava {
              // some time later, after outputs have completed
              ((CanCommitOffsets) stream.inputDStream()).commitAsync(offsetRanges);
          });
-
 
          try {
              streamingContext.start();
