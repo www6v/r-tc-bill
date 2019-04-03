@@ -14,10 +14,13 @@ import org.slf4j.LoggerFactory;
 import scala.Tuple2;
 
 public class SparkStreamingKafkaForJava {
-
     private  final static Logger logger = LoggerFactory.getLogger(SparkStreamingKafkaForJava.class);
 
-     public static void main(String args[]) {
+    public static final String BOOTSTRAP_SERVERS = "10.25.16.164:9092,10.25.22.115:9092,10.25.21.72:9092";
+    public static final String TOPIC_NAME = "urtc_bill_log";
+    public static final String GROUP_ID ="urtc_bill_group";
+
+    public static void main(String args[]) {
 
          SparkConf _sparkConf= new SparkConf();
          JavaSparkContext sparkContext= new JavaSparkContext(_sparkConf);
@@ -25,14 +28,14 @@ public class SparkStreamingKafkaForJava {
 //         SQLContext sqlContext = new SQLContext(sparkContext);
 
          Map<String, Object> kafkaParams = new HashMap<>();
-         kafkaParams.put("bootstrap.servers", "10.25.16.164:9092,10.25.22.115:9092,10.25.21.72:9092");
+         kafkaParams.put("bootstrap.servers", BOOTSTRAP_SERVERS);
          kafkaParams.put("key.deserializer", StringDeserializer.class);
          kafkaParams.put("value.deserializer", StringDeserializer.class);
-         kafkaParams.put("group.id", "group1");
+         kafkaParams.put("group.id", GROUP_ID);
          kafkaParams.put("auto.offset.reset", "latest");
          kafkaParams.put("enable.auto.commit", false);
 
-         Collection<String> topics = Arrays.asList("bill-test");
+         Collection<String> topics = Arrays.asList(TOPIC_NAME);
 
          JavaInputDStream<ConsumerRecord<String, String>> stream =
                  KafkaUtils.createDirectStream(
@@ -41,20 +44,20 @@ public class SparkStreamingKafkaForJava {
                          ConsumerStrategies.<String, String>Subscribe(topics, kafkaParams)
                  );
 
-         stream.mapToPair(record -> new Tuple2<>(record.key(), record.value()));
-
-         OffsetRange[] offsetRanges1 = {
-                 // topic, partition, inclusive starting offset, exclusive ending offset
-                 OffsetRange.create("bill-test", 0, 0, 100),
-                 OffsetRange.create("bill-test", 1, 0, 100)
-         };
-
-         JavaRDD<ConsumerRecord<String, String>> rdd1 = KafkaUtils.createRDD(
-                 sparkContext,
-                 kafkaParams,
-                 offsetRanges1,
-                 LocationStrategies.PreferConsistent()
-         );
+         /////
+//         stream.mapToPair(record -> new Tuple2<>(record.key(), record.value()));
+//         OffsetRange[] offsetRanges1 = {
+//                 // topic, partition, inclusive starting offset, exclusive ending offset
+//                 OffsetRange.create(TOPIC_NAME, 0, 0, 100),
+//                 OffsetRange.create(TOPIC_NAME, 1, 0, 100)
+//         };
+//         JavaRDD<ConsumerRecord<String, String>> rdd1 = KafkaUtils.createRDD(
+//                 sparkContext,
+//                 kafkaParams,
+//                 offsetRanges1,
+//                 LocationStrategies.PreferConsistent()
+//         );
+         /////
 
          stream.foreachRDD(rdd -> {
              OffsetRange[] offsetRanges = ((HasOffsetRanges) rdd.rdd()).offsetRanges();
@@ -71,34 +74,35 @@ public class SparkStreamingKafkaForJava {
                      String key = next.key();
                      String value = next.value();
 
-                     if(key!=null){
-                         System.out.println("key:" + key);
-                         logger.info("key:" + key);
-                     }
+//                     if(key!=null){
+//                         logger.info("key:" + key);
+//                     }
                      if(value!=null){
-                         System.out.println("value:" + value);
                          logger.info("value:" + value);
                      }
-                     DbStore.insertDB(key, 345);
+                     DbStore.insertDB(value, 345);
                  }
              });
-         });
-
-         stream.foreachRDD ( rdd -> {
-                     rdd.foreachPartition(partitionOfRecords -> {
-//                 // ConnectionPool is a static, lazily initialized pool of connections
-//                 Connection connection = ConnectionPool.getConnection();
-//                 partitionOfRecords.foreach(record -> connection.send(record));
-//                 ConnectionPool.returnConnection(connection);  // return to the pool for future reuse
-                     });
-                 });
-
-         stream.foreachRDD(rdd -> {
-             OffsetRange[] offsetRanges = ((HasOffsetRanges) rdd.rdd()).offsetRanges();
 
              // some time later, after outputs have completed
              ((CanCommitOffsets) stream.inputDStream()).commitAsync(offsetRanges);
          });
+
+//         stream.foreachRDD ( rdd -> {
+//                     rdd.foreachPartition(partitionOfRecords -> {
+////                 // ConnectionPool is a static, lazily initialized pool of connections
+////                 Connection connection = ConnectionPool.getConnection();
+////                 partitionOfRecords.foreach(record -> connection.send(record));
+////                 ConnectionPool.returnConnection(connection);  // return to the pool for future reuse
+//                     });
+//                 });
+
+//         stream.foreachRDD(rdd -> {
+//             OffsetRange[] offsetRanges = ((HasOffsetRanges) rdd.rdd()).offsetRanges();
+//
+//             // some time later, after outputs have completed
+//             ((CanCommitOffsets) stream.inputDStream()).commitAsync(offsetRanges);
+//         });
 
          try {
              streamingContext.start();
