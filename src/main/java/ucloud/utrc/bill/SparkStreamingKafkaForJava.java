@@ -75,13 +75,19 @@ public class SparkStreamingKafkaForJava {
                      String key = next.key();
                      String value = next.value();
 
-                     System.out.print("key:" + key);
-                     System.out.print("value:" + value);
-                     logger.info("key:" + key);
-                     logger.info("value:" + value);
+                     if(key!=null){
+                         System.out.println("key:" + key);
+                         logger.info("key:" + key);
 
-                     List<Row> rowList1 = new ArrayList<>();
-                     dataAccess.insertdb( rowList1, key, 890,sqlContext );
+                         List<Row> rowList1 = new ArrayList<>();
+                         dataAccess.insertdb( rowList1, key, 109,sqlContext );
+                     }
+                     if(value!=null){
+                         System.out.println("value:" + value);
+                         logger.info("value:" + value);
+                         List<Row> rowList1 = new ArrayList<>();
+                         dataAccess.insertdb( rowList1, value, 890,sqlContext );
+                     }
                  }
              });
          });
