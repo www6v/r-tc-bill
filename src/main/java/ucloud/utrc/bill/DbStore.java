@@ -11,7 +11,7 @@ public class DbStore {
         insertDB("123", 579);
     }
 
-    public static void insertDB(String name,Integer age) {
+    public static void insertDB(String roomId,Integer count) {
         Connection con;
         String driver = "com.mysql.jdbc.Driver";
         String url = "jdbc:mysql://10.25.29.26:3306/test";
@@ -22,7 +22,7 @@ public class DbStore {
             Class.forName(driver);
             con = DriverManager.getConnection(url,user,password);
             Statement statement = con.createStatement();
-            String sql = "INSERT INTO person (name, age) VALUES ('"+ name +"', "+ age +")";
+            String sql = "INSERT INTO rtc_bill (room_id, count) VALUES ('"+ roomId +"', "+ count +")";
             int i = statement.executeUpdate(sql);
 
             System.out.println("updated " + i + " record.");

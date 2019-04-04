@@ -195,6 +195,12 @@
       <artifactId>mysql-connector-java</artifactId>
       <version>5.1.38</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>1.2.56</version>
+    </dependency>
   </dependencies>
 
   <repositories>
@@ -247,7 +253,8 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <!--<mainClass>consumer.kafka.client.RtcBill</mainClass>-->
-              <mainClass>ucloud.utrc.bill.SparkStreamingKafkaForJava</mainClass>
+              <!--<mainClass>ucloud.utrc.bill.SparkStreamingKafkaForJava</mainClass>-->
+              <mainClass>ucloud.utrc.bill.SparkStreamingKafka</mainClass>
             </manifest>
           </archive>
         </configuration>
