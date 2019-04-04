@@ -67,17 +67,15 @@ object SparkStreamingKafka {
 //      val roomId = jsonObject.getOrDefault("roomId",null)
 //      val streamId = jsonObject.getOrDefault("streamId",null)
 
-      var appId = jsonObject.getString("appId")
-      var userId = jsonObject.getString("userId")
+      val appId = jsonObject.getString("appId")
+      val userId = jsonObject.getString("userId")
       val streamId = jsonObject.getString("streamId")
       val id = appId + "-" + userId;
 
-      logger.info( "appId: " + appId)
-      logger.info( "userId: " + userId)
       logger.info( "streamId: " + streamId)
       logger.info( "id: " + id)
 
-//      stream.asInstanceOf[CanCommitOffsets].commitAsync(offsetRanges)
+//    stream.asInstanceOf[CanCommitOffsets].commitAsync(offsetRanges)
 
       (id,streamId)
     });

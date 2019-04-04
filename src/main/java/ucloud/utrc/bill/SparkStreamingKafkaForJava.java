@@ -74,9 +74,6 @@ public class SparkStreamingKafkaForJava {
                      String key = next.key();
                      String value = next.value();
 
-//                     if(key!=null){
-//                         logger.info("key:" + key);
-//                     }
                      if(value!=null){
                          logger.info("value:" + value);
                      }
