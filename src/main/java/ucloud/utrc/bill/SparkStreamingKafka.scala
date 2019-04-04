@@ -53,7 +53,6 @@ object SparkStreamingKafka {
       val mstag = jsonObject.getString("mstag")
 
       logger.info( "mstag: " + mstag)
-      logger.info( "mstag.equals(STAT)" + mstag.equals("STAT") )
 
       mstag.equals("STAT")
     });
