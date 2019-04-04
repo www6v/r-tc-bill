@@ -1,6 +1,6 @@
 package ucloud.utrc.bill
 
-import com.alibaba.fastjson.JSON
+import com.alibaba.fastjson.{JSONException, JSON}
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
 
@@ -12,7 +12,7 @@ import org.apache.spark.{TaskContext, SparkConf, SparkContext}
 import org.slf4j.{LoggerFactory, Logger}
 
 object SparkStreamingKafka {
-  private val logger: Logger = LoggerFactory.getLogger(classOf[SparkStreamingKafkaForJava])
+  private val logger: Logger = LoggerFactory.getLogger(SparkStreamingKafka.getClass)
 
   val BOOTSTRAP_SERVERS: String = "10.25.16.164:9092,10.25.22.115:9092,10.25.21.72:9092"
   val TOPIC_NAME: String = "urtc_bill_log"
@@ -49,13 +49,29 @@ object SparkStreamingKafka {
     //     KafkaUtils.createRDD[String, String](javaSparkContext,  kafkaParams, offsetRanges, PreferConsistent);
 
     val filtedRdd = stream.filter(consumerRecord => {
-      val jsonObject = JSON.parseObject(consumerRecord.value())
-      val mstag = jsonObject.getString("mstag")
+      try {
+         val jsonObject = JSON.parseObject(consumerRecord.value())
+         if(jsonObject==null) {
+           false
+         }
+         val mstag = jsonObject.getString("mstag")
+         if(mstag==null) {
+           false
+         }
 
-      logger.info( "mstag: " + mstag)
+         logger.info( "mstag: " + mstag)
 
-      mstag.equals("STAT")
+         mstag.equals("STAT")
+      } catch {
+        case ex: JSONException =>{
+          false
+        }
+      }
+
     });
+
+
+
 
     val handlerdRdd = filtedRdd.map( consumerRecord => {
 //      val offsetRanges = consumerRecord.asInstanceOf[HasOffsetRanges].offsetRanges
