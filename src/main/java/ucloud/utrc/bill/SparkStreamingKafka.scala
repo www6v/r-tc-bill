@@ -1,6 +1,7 @@
 package ucloud.utrc.bill
 
 import com.alibaba.fastjson.{JSONException, JSON}
+import org.apache.commons.lang3.StringUtils
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
 
@@ -48,23 +49,26 @@ object SparkStreamingKafka {
     //     org.apache.spark.streaming.kafka010.KafkaUtils.createRDD[String, String](sparkContext, kafkaParams, offsetRanges, PreferConsistent)
     //     KafkaUtils.createRDD[String, String](javaSparkContext,  kafkaParams, offsetRanges, PreferConsistent);
 
-    val filtedRdd = stream.filter(consumerRecord => {
+    val filtedRdd = stream
+      .filter(consumerRecord => StringUtils.isNotEmpty(consumerRecord.value()))
+      .filter(consumerRecord => {
+        val result = false;
       try {
          val jsonObject = JSON.parseObject(consumerRecord.value())
-         if(jsonObject==null) {
-           false
-         }
+//         if(jsonObject==null) {
+//           return false
+//         }
          val mstag = jsonObject.getString("mstag")
-         if(mstag==null) {
-           false
-         }
+//         if(mstag==null) {
+//           return false
+//         }
 
          logger.info( "mstag: " + mstag)
 
          mstag.equals("STAT")
       } catch {
         case ex: JSONException =>{
-          false
+          result
         }
       }
 
