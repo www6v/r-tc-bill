@@ -57,10 +57,14 @@ object SparkStreamingKafka {
       try {
          val jsonObject = JSON.parseObject(consumerRecord.value())
          val mstag = jsonObject.getString("mstag")
+         val _type = jsonObject.getString("type")
 
-         logger.info( "mstag: " + mstag)
+         logger.info( "mstag: " + mstag + " type:" + _type)
 
-         mstag.equals("STAT")
+         val isBillLog: Boolean = mstag.equals("STAT")
+         val isPullStreaming: Boolean = _type.equals("PULL")
+
+         isBillLog && isPullStreaming
       } catch {
         case ex: JSONException =>{
           result
@@ -68,7 +72,6 @@ object SparkStreamingKafka {
       }
 
     });
-
 
 
     val handlerdRdd = filtedRdd.map( consumerRecord => {
