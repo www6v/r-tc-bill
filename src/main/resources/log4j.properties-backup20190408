@@ -1,0 +1,20 @@
+#
+## Create a single appender called 'stdout' with 
+## a log level of 'INFO'
+log4j.rootLogger=ERROR, stdout
+
+## Log to console
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%-5p: %c - %m%n
+
+# Restrict logging for specific 
+# log4j.logger.consumer.kafka=WARN
+log4j.logger.consumer.kafka=debug, stdout, test1
+
+log4j.appender.test1=org.apache.log4j.FileAppender
+log4j.appender.test1.File=/home/wei/consumerKafka.log
+log4j.appender.test1.layout=org.apache.log4j.PatternLayout
+log4j.appender.test1.layout.ConversionPattern=%d %p [%c] - %m%n
+
+

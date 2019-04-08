@@ -11,6 +11,7 @@ import org.apache.spark.streaming.kafka010.{CanCommitOffsets, HasOffsetRanges, K
 import org.apache.spark.streaming.{Durations, StreamingContext}
 import org.apache.spark.{TaskContext, SparkConf, SparkContext}
 import org.slf4j.{LoggerFactory, Logger}
+import ucloud.utrc.bill.mybatis.RtcBillDataAccess
 
 object SparkStreamingKafka {
   private val logger: Logger = LoggerFactory.getLogger(SparkStreamingKafka.getClass)
@@ -90,7 +91,7 @@ object SparkStreamingKafka {
       val appId = jsonObject.getString("appId")
       val userId = jsonObject.getString("userId")
       val streamId = jsonObject.getString("streamId")
-      val id = appId + "-" + userId;
+      val id = appId + "|" + userId;
 
       logger.info( "streamId: " + streamId)
       logger.info( "id: " + id)
@@ -115,7 +116,8 @@ object SparkStreamingKafka {
               logger.info( "roomId: " + roomId)
               logger.info( "count: " + count)
 
-              DbStore.insertDB(roomId, count)
+//              DbStore.insertDB(roomId, count)
+              RtcBillDataAccess.insertDB(roomId,count)
             }
           }
       }
