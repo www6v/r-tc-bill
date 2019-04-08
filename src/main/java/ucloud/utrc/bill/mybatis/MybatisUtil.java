@@ -1,12 +1,12 @@
-package com.xfishs.utils;
+package ucloud.utrc.bill.mybatis;
 
-        import org.apache.ibatis.io.Resources;
-        import org.apache.ibatis.session.SqlSession;
-        import org.apache.ibatis.session.SqlSessionFactory;
-        import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
-        import java.io.IOException;
-        import java.io.Reader;
+import java.io.IOException;
+import java.io.Reader;
 
 public class MybatisUtil {
 
@@ -23,7 +23,6 @@ public class MybatisUtil {
 
     }
 
-    //采用单例模式，私有化构造方法
     private MybatisUtil(){}
 
     public static SqlSession getSqlSession(){

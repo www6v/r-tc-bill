@@ -56,13 +56,7 @@ object SparkStreamingKafka {
         val result = false;
       try {
          val jsonObject = JSON.parseObject(consumerRecord.value())
-//         if(jsonObject==null) {
-//           return false
-//         }
          val mstag = jsonObject.getString("mstag")
-//         if(mstag==null) {
-//           return false
-//         }
 
          logger.info( "mstag: " + mstag)
 
@@ -74,7 +68,6 @@ object SparkStreamingKafka {
       }
 
     });
-
 
 
 
