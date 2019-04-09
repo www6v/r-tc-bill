@@ -19,12 +19,14 @@ object SparkStreamingKafka {
   val BOOTSTRAP_SERVERS: String = "10.25.16.164:9092,10.25.22.115:9092,10.25.21.72:9092"
   val TOPIC_NAME: String = "urtc_bill_log"
   val GROUP_ID: String = "urtc_bill_group"
+  val DURATIONS_TIME: Long = 30;
+  val SEPERATOR : String =  "|";
 
   def main(args:Array[String]) : Unit = {
 
     val _sparkConf: SparkConf = new SparkConf()
     val sparkContext: SparkContext = new SparkContext(_sparkConf)
-    val streamingContext: StreamingContext = new StreamingContext(sparkContext, Durations.seconds(30))
+    val streamingContext: StreamingContext = new StreamingContext(sparkContext, Durations.seconds(DURATIONS_TIME))
 
     val kafkaParams = Map[String, Object](
       "bootstrap.servers" -> BOOTSTRAP_SERVERS,
@@ -93,7 +95,7 @@ object SparkStreamingKafka {
       val profile = jsonObject.getString("profile")
 
       val streamId = jsonObject.getString("streamId")
-      val id = appId + "|" + userId + "|" + roomId + "|" + profile;
+      val id = appId + SEPERATOR + userId + SEPERATOR + roomId + SEPERATOR + profile;
 
       logger.info( "streamId: " + streamId)
       logger.info( "id: " + id)
@@ -115,10 +117,10 @@ object SparkStreamingKafka {
               val roomId = row._1;
               val count = row._2;
 
-              val appIdIndex = roomId.indexOf("|");
+              val appIdIndex = roomId.indexOf(SEPERATOR);
               val appId = roomId.substring(0, appIdIndex)
 
-              val profileIndex = roomId.lastIndexOf("|") + 1;
+              val profileIndex = roomId.lastIndexOf(SEPERATOR) + 1;
               val length = roomId.length;
               val profile = roomId.substring(profileIndex, length)
 
