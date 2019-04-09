@@ -89,10 +89,11 @@ object SparkStreamingKafka {
 
       val appId = jsonObject.getString("appId")
       val userId = jsonObject.getString("userId")
+      val roomId = jsonObject.getString("roomId")
       val profile = jsonObject.getString("profile")
 
       val streamId = jsonObject.getString("streamId")
-      val id = appId + "|" + userId + "|" + profile;
+      val id = appId + "|" + userId + "|" + roomId + "|" + profile;
 
       logger.info( "streamId: " + streamId)
       logger.info( "id: " + id)
