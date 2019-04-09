@@ -52,26 +52,29 @@ object SparkStreamingKafka {
 
     val filtedRdd = stream
       .filter(consumerRecord => StringUtils.isNotEmpty(consumerRecord.value()))
-      .filter(consumerRecord => {
-        val result = false;
-      try {
-         val jsonObject = JSON.parseObject(consumerRecord.value())
-         val mstag = jsonObject.getString("mstag")
-         val _type = jsonObject.getString("type")
+      .filter(filterFunc = consumerRecord => {
+        var result = false;
+        try {
+          val jsonObject = JSON.parseObject(consumerRecord.value())
+          val mstag = jsonObject.getString("mstag")
+          val _type = jsonObject.getString("type")
 
-         logger.info( "mstag: " + mstag + " type:" + _type)
+          logger.info("mstag: " + mstag + " type:" + _type)
 
-         val isBillLog: Boolean = mstag.equals("STAT")
-         val isPullStreaming: Boolean = _type.equals("PULL")
-
-         isBillLog && isPullStreaming
-      } catch {
-        case ex: JSONException =>{
+          val isBillLog: Boolean = mstag.equals("STAT")
+          if(!StringUtils.isNotEmpty(_type)) {
+            result = false
+          } else {
+            val isPullStreaming: Boolean = _type.equals("PULL")
+            result = isBillLog && isPullStreaming
+          }
           result
+        } catch {
+          case ex: JSONException => {
+            result
+          }
         }
-      }
-
-    });
+      });
 
 
     val handlerdRdd = filtedRdd.map( consumerRecord => {
