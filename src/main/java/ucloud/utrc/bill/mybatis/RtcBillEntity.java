@@ -4,6 +4,7 @@ import java.util.Date;
 
 public class RtcBillEntity {
     private int id;
+    private String appId;
     private String roomId;
     private int count;
     private Date insertTime;
@@ -38,5 +39,12 @@ public class RtcBillEntity {
 
     public void setInsertTime(Date insertTime) {
         this.insertTime = insertTime;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 }

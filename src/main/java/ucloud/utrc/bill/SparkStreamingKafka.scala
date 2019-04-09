@@ -89,8 +89,10 @@ object SparkStreamingKafka {
 
       val appId = jsonObject.getString("appId")
       val userId = jsonObject.getString("userId")
+      val profile = jsonObject.getString("profile")
+
       val streamId = jsonObject.getString("streamId")
-      val id = appId + "|" + userId;
+      val id = appId + "|" + userId + "|" + profile;
 
       logger.info( "streamId: " + streamId)
       logger.info( "id: " + id)
@@ -112,11 +114,14 @@ object SparkStreamingKafka {
               val roomId = row._1;
               val count = row._2;
 
+              val index = roomId.indexOf("|");
+              val appId = roomId.substring(0, index)
               logger.info( "roomId: " + roomId)
               logger.info( "count: " + count)
+              logger.info( "appId: " + appId)
 
 //              DbStore.insertDB(roomId, count)
-              RtcBillDataAccess.insertDB(roomId,count)
+              RtcBillDataAccess.insertDB(roomId,count, appId)
             }
           }
       }
