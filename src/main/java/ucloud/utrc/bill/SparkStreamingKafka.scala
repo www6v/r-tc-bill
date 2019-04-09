@@ -117,7 +117,7 @@ object SparkStreamingKafka {
               val appIdIndex = roomId.indexOf("|");
               val appId = roomId.substring(0, appIdIndex)
 
-              val profileIndex = roomId.lastIndexOf("|");
+              val profileIndex = roomId.lastIndexOf("|") + 1;
               val length = roomId.length;
               val profile = roomId.substring(profileIndex, length)
 
