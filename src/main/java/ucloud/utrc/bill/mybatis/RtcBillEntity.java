@@ -6,6 +6,7 @@ public class RtcBillEntity {
     private int id;
     private String appId;
     private String roomId;
+    private String profile;
     private int count;
     private Date insertTime;
 
@@ -46,5 +47,12 @@ public class RtcBillEntity {
     }
     public void setAppId(String appId) {
         this.appId = appId;
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+    public void setProfile(String profile) {
+        this.profile = profile;
     }
 }

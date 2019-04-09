@@ -3,11 +3,13 @@ package ucloud.utrc.bill.mybatis;
 import org.apache.ibatis.session.SqlSession;
 
 public class RtcBillDataAccess {
-    public static void insertDB(String roomId, Integer count, String appId) {
+
+    public static void insertDB(String appId, String roomId, Integer count,String profile) {
         RtcBillEntity rtcBillEntity = new RtcBillEntity();
-        rtcBillEntity.setRoomId(roomId);
-        rtcBillEntity.setCount(count);
         rtcBillEntity.setAppId(appId);
+        rtcBillEntity.setRoomId(roomId);
+        rtcBillEntity.setProfile(profile);
+        rtcBillEntity.setCount(count);
 
         SqlSession sqlSession = MybatisUtil.getSqlSession();
         RtcBillMapper rtcBillMapper = sqlSession.getMapper(RtcBillMapper.class);
