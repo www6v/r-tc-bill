@@ -4,7 +4,7 @@
 <mapper namespace="ucloud.utrc.bill.mybatis.RtcBillMapper">
 
     <insert id="insertBill" parameterType="RtcBillEntity" >
-       insert into rtc_bill(app_id, room_id, profile, count) values (#{appId}, #{roomId}, #{profile}, #{count})
+       insert into rtc_bill(app_id, room_id, profile, count, time) values (#{appId}, #{roomId}, #{profile}, #{count}, #{time})
     </insert>
 
     <select id="selectBill" parameterType="int" resultType="RtcBillEntity">

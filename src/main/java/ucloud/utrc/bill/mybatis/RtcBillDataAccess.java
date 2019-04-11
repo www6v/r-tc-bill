@@ -4,12 +4,13 @@ import org.apache.ibatis.session.SqlSession;
 
 public class RtcBillDataAccess {
 
-    public static void insertDB(String appId, String roomId, Integer count,String profile) {
+    public static void insertDB(String appId, String roomId, Integer count,String profile, Long time) {
         RtcBillEntity rtcBillEntity = new RtcBillEntity();
         rtcBillEntity.setAppId(appId);
         rtcBillEntity.setRoomId(roomId);
         rtcBillEntity.setProfile(profile);
         rtcBillEntity.setCount(count);
+        rtcBillEntity.setTime(time);
 
         SqlSession sqlSession = MybatisUtil.getSqlSession();
         RtcBillMapper rtcBillMapper = sqlSession.getMapper(RtcBillMapper.class);

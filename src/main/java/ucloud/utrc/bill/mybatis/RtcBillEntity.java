@@ -8,6 +8,7 @@ public class RtcBillEntity {
     private String roomId;
     private String profile;
     private int count;
+    private Long time;
     private Date insertTime;
 
     public int getId() {
@@ -54,5 +55,12 @@ public class RtcBillEntity {
     }
     public void setProfile(String profile) {
         this.profile = profile;
+    }
+
+    public Long getTime() {
+        return time;
+    }
+    public void setTime(Long time) {
+        this.time = time;
     }
 }
