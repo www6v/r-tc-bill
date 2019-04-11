@@ -129,9 +129,9 @@ object SparkStreamingKafka {
         else
          x2._2 },
        { if(  x1._3 > x2._3 )
-         x1._3
+         x2._3
        else
-         x2._3 }
+         x1._3 }
       ))
 
     rddAgg.foreachRDD { rdd =>
