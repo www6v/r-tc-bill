@@ -117,16 +117,22 @@ object SparkStreamingKafka {
 //    stream.asInstanceOf[CanCommitOffsets].commitAsync(offsetRanges)
 
 //      (id,streamId)
-      (id,(1, time))
+      (id,(1, time,time))
     });
 
 //    val rddRow = handlerdRdd.mapValues(streamId => 1);
 //    val rddAgg = rddRow.reduceByKey(_ + _);
 
-    val rddAgg = handlerdRdd.reduceByKey((x1, x2) =>(x1._1 + x2._1, { if(  x1._2 > x2._2 )
-      x1._2
-    else
-      x2._2 } ))
+    val rddAgg = handlerdRdd.reduceByKey((x1, x2) =>(x1._1 + x2._1,
+      { if(  x1._2 > x2._2 )
+         x1._2
+        else
+         x2._2 },
+       { if(  x1._3 > x2._3 )
+         x1._3
+       else
+         x2._3 }
+      ))
 
     rddAgg.foreachRDD { rdd =>
 
@@ -136,7 +142,8 @@ object SparkStreamingKafka {
               val row = itor.next();
               val roomId = row._1;
               val count = row._2._1;
-              val time = row._2._2;
+              val endTime = row._2._2;
+              val startTime = row._2._3;
 
               val appIdIndex = roomId.indexOf(SEPERATOR);
               val appId = roomId.substring(0, appIdIndex)
@@ -151,7 +158,7 @@ object SparkStreamingKafka {
               logger.info( "profile: " + profile)
 
 //              DbStore.insertDB(roomId, count)
-              RtcBillDataAccess.insertDB(appId, roomId, count, profile, time)
+              RtcBillDataAccess.insertDB(appId, roomId, count, profile, endTime, startTime)
             }
           }
       }
