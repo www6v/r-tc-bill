@@ -121,9 +121,7 @@ object SparkStreamingKafka {
     });
 
 //    val rddRow = handlerdRdd.mapValues(streamId => 1);
-//    val rddRow = handlerdRdd.mapValues( (streamId, time )=> (1, time) );
 //    val rddAgg = rddRow.reduceByKey(_ + _);
-//    val rddAgg = handlerdRdd.reduceByKey(_ + _);
 
     val rddAgg = handlerdRdd.reduceByKey((x1, x2) =>(x1._1 + x2._1, { if(  x1._2 > x2._2 )
       x1._2
