@@ -53,7 +53,12 @@ object SparkStreamingKafka {
     //     org.apache.spark.streaming.kafka010.KafkaUtils.createRDD[String, String](sparkContext, kafkaParams, offsetRanges, PreferConsistent)
     //     KafkaUtils.createRDD[String, String](javaSparkContext,  kafkaParams, offsetRanges, PreferConsistent);
 
+    var offsetRanges: Array[OffsetRange] = Array.empty[OffsetRange]
     val filtedRdd = stream
+      .transform(rdd => {
+         offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
+         rdd
+    })
       .filter(consumerRecord => StringUtils.isNotEmpty(consumerRecord.value()))
       .filter(filterFunc = consumerRecord => {
         var result = false;
@@ -163,6 +168,7 @@ object SparkStreamingKafka {
           }
       }
 
+      stream.asInstanceOf[CanCommitOffsets].commitAsync(offsetRanges)
     }
 
 
