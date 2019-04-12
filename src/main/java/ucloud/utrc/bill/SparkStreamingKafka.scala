@@ -111,8 +111,11 @@ object SparkStreamingKafka {
 
       val streamId = jsonObject.getString("streamId")
 
-      val time = jsonObject.getLong("time")
+      var time = jsonObject.getLong("time")
 
+      if(time==null){
+         time = 333L;  /// test
+      }
 //      val id = appId + SEPERATOR + userId + SEPERATOR + roomId + SEPERATOR + profile;
       val id = appId + SEPERATOR + userId + SEPERATOR + roomId + SEPERATOR + streamId + SEPERATOR + profile;
 
@@ -128,7 +131,8 @@ object SparkStreamingKafka {
 //    val rddRow = handlerdRdd.mapValues(streamId => 1);
 //    val rddAgg = rddRow.reduceByKey(_ + _);
 
-    val rddAgg = handlerdRdd.reduceByKey((x1, x2) =>(x1._1 + x2._1,
+    val rddAgg = handlerdRdd.reduceByKey((x1, x2) =>(
+      x1._1 + x2._1,
       { if(  x1._2 > x2._2 )
          x1._2
         else
