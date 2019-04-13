@@ -10,6 +10,7 @@ import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010.{CanCommitOffsets, HasOffsetRanges, KafkaUtils, OffsetRange}
 import org.apache.spark.streaming.{Durations, StreamingContext}
 import org.apache.spark.{TaskContext, SparkConf, SparkContext}
+import org.joda.time.DateTime
 import org.slf4j.{LoggerFactory, Logger}
 import ucloud.utrc.bill.mybatis.RtcBillDataAccess
 
@@ -111,11 +112,11 @@ object SparkStreamingKafka {
 
       val streamId = jsonObject.getString("streamId")
 
-      var time = jsonObject.getLong("time")
+      val ts = jsonObject.getString("ts")
+      val dt = DateTime.parse(ts);
+      var time = dt.getMillis();
+//      jsonObject.getLong("time")
 
-      if(time==null){
-         time = 333L;  /// test
-      }
 //      val id = appId + SEPERATOR + userId + SEPERATOR + roomId + SEPERATOR + profile;
       val id = appId + SEPERATOR + userId + SEPERATOR + roomId + SEPERATOR + streamId + SEPERATOR + profile;
 
