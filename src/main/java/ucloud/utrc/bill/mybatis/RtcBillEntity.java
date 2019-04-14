@@ -11,6 +11,9 @@ public class RtcBillEntity {
     private Long endTime;
     private Long startTime;
 
+    private Integer videoCount;
+    private Integer audioCount;
+
     private Date insertTime;
 
     public int getId() {
@@ -74,5 +77,21 @@ public class RtcBillEntity {
 
     public void setStartTime(Long startTime) {
         this.startTime = startTime;
+    }
+
+    public Integer getVideoCount() {
+        return videoCount;
+    }
+
+    public void setVideoCount(Integer videoCount) {
+        this.videoCount = videoCount;
+    }
+
+    public Integer getAudioCount() {
+        return audioCount;
+    }
+
+    public void setAudioCount(Integer audioCount) {
+        this.audioCount = audioCount;
     }
 }

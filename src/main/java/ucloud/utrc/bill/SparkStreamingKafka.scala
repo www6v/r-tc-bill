@@ -96,8 +96,6 @@ object SparkStreamingKafka {
 //    })
 
     val handlerdRdd = filtedRdd.map( consumerRecord => {
-//      val offsetRanges = consumerRecord.asInstanceOf[HasOffsetRanges].offsetRanges
-
       val jsonObject = JSON.parseObject(consumerRecord.value())
 
 //      var appId = jsonObject.getOrDefault("appId",null)
@@ -109,24 +107,21 @@ object SparkStreamingKafka {
       val userId = jsonObject.getString("userId")
       val roomId = jsonObject.getString("roomId")
       val profile = jsonObject.getString("profile")
-
       val streamId = jsonObject.getString("streamId")
+
+      val video = jsonObject.getInteger("video")
+      val audio = jsonObject.getInteger("audio")
 
       val ts = jsonObject.getString("ts")
       val dt = DateTime.parse(ts);
       val time = dt.getMillis();
-//      val time = jsonObject.getLong("time")
 
-//      val id = appId + SEPERATOR + userId + SEPERATOR + roomId + SEPERATOR + profile;
       val id = appId + SEPERATOR + userId + SEPERATOR + roomId + SEPERATOR + streamId + SEPERATOR + profile;
 
       logger.info( "streamId: " + streamId)
       logger.info( "id: " + id)
 
-//    stream.asInstanceOf[CanCommitOffsets].commitAsync(offsetRanges)
-
-//      (id,streamId)
-      (id,(1, time,time))
+      (id,(1, time, time, video, audio))
     });
 
 //    val rddRow = handlerdRdd.mapValues(streamId => 1);
@@ -141,7 +136,9 @@ object SparkStreamingKafka {
        { if(  x1._3 > x2._3 )
          x2._3
        else
-         x1._3 }
+         x1._3 },
+      x1._4 + x2._4,
+      x1._5 + x2._5
       ))
 
     rddAgg.foreachRDD { rdd =>
@@ -154,6 +151,9 @@ object SparkStreamingKafka {
               val count = row._2._1;
               val endTime = row._2._2;
               val startTime = row._2._3;
+
+              val videoCount = row._2._4;
+              val audioCount = row._2._5
 
               val appIdIndex = roomId.indexOf(SEPERATOR);
               val appId = roomId.substring(0, appIdIndex)
@@ -168,7 +168,7 @@ object SparkStreamingKafka {
               logger.info( "profile: " + profile)
 
 //              DbStore.insertDB(roomId, count)
-              RtcBillDataAccess.insertDB(appId, roomId, count, profile, endTime, startTime)
+              RtcBillDataAccess.insertDB(appId, roomId, count, profile, endTime, startTime, videoCount, audioCount)
             }
           }
       }
