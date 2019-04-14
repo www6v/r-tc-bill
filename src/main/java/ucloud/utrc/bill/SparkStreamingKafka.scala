@@ -113,7 +113,7 @@ object SparkStreamingKafka {
       val audio = jsonObject.getInteger("audio")
 
       val ts = jsonObject.getString("ts")
-      var time;
+      var time = 111L;
       if(ts ==null) {
         time = 111L;
       }
@@ -135,7 +135,7 @@ object SparkStreamingKafka {
 
     val rddAgg = handlerdRdd.reduceByKey((x1, x2) =>(
       x1._1 + x2._1,
-      { if(  x1._2 > x2._2 )
+      { if(  x1._2 > x2._2 ) 
          x1._2
         else
          x2._2 },
