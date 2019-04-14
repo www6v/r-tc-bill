@@ -112,10 +112,10 @@ object SparkStreamingKafka {
 
       val streamId = jsonObject.getString("streamId")
 
-//      val ts = jsonObject.getString("ts")
-//      val dt = DateTime.parse(ts);
-//      val time = dt.getMillis();
-      val time = jsonObject.getLong("time")
+      val ts = jsonObject.getString("ts")
+      val dt = DateTime.parse(ts);
+      val time = dt.getMillis();
+//      val time = jsonObject.getLong("time")
 
 //      val id = appId + SEPERATOR + userId + SEPERATOR + roomId + SEPERATOR + profile;
       val id = appId + SEPERATOR + userId + SEPERATOR + roomId + SEPERATOR + streamId + SEPERATOR + profile;
