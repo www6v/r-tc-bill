@@ -113,8 +113,14 @@ object SparkStreamingKafka {
       val audio = jsonObject.getInteger("audio")
 
       val ts = jsonObject.getString("ts")
-      val dt = DateTime.parse(ts);
-      val time = dt.getMillis();
+      var time;
+      if(ts ==null) {
+        time = 111L;
+      }
+      else {
+        val dt = DateTime.parse(ts);
+        time = dt.getMillis();
+      }
 
       val id = appId + SEPERATOR + userId + SEPERATOR + roomId + SEPERATOR + streamId + SEPERATOR + profile;
 
