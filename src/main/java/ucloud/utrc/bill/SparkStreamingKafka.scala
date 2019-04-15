@@ -21,7 +21,7 @@ object SparkStreamingKafka {
   val BOOTSTRAP_SERVERS: String = "10.25.16.164:9092,10.25.22.115:9092,10.25.21.72:9092"
   val TOPIC_NAME: String = "urtc_bill_log"
   val GROUP_ID: String = "urtc_bill_group"
-  val DURATIONS_TIME: Long = 30 * 5;
+  val DURATIONS_TIME: Long = 30 * 3;
   val SEPERATOR : String =  "|";
 
   def main(args:Array[String]) : Unit = {
