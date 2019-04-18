@@ -60,7 +60,7 @@ object SparkStreamingKafka {
          offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
          rdd
     })
-      .filter(consumerRecord => StringUtils.isNotEmpty(consumerRecord.value()))
+      .filter(consumerRecord => StringUtils.isNotEmpty(consumerRecord.value()) && consumerRecord.value().contains("mstag"))
       .filter(filterFunc = consumerRecord => {
         var result = false;
         try {
