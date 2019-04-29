@@ -18,9 +18,9 @@ import ucloud.utrc.bill.mybatis.RtcBillDataAccess
 object SparkStreamingKafka {
   private val logger: Logger = LoggerFactory.getLogger(SparkStreamingKafka.getClass)
 
-  val BOOTSTRAP_SERVERS: String =  PropertiesUtil.getPropString("kafka.bootstrap.servers")  // "10.25.16.164:9092,10.25.22.115:9092,10.25.21.72:9092"
-  val TOPIC_NAME: String = PropertiesUtil.getPropString("kafka.topic")  // "urtc_bill_log"
-  val GROUP_ID: String =  PropertiesUtil.getPropString("kafka.group.id") //    "urtc_bill_group"
+  val BOOTSTRAP_SERVERS: String =  PropertiesUtil.getPropString("kafka.bootstrap.servers")
+  val TOPIC_NAME: String = PropertiesUtil.getPropString("kafka.topic")
+  val GROUP_ID: String =  PropertiesUtil.getPropString("kafka.group.id")
   val DURATIONS_TIME: Long = 30 * 3;
   val SEPERATOR : String =  "|";
   val CHECKPOINT_DIR = "rtc_bill_checkpoint"
@@ -35,10 +35,6 @@ object SparkStreamingKafka {
   }
 
   def main(args:Array[String]) : Unit = {
-//    val _sparkConf: SparkConf = new SparkConf()
-//    val sparkContext: SparkContext = new SparkContext(_sparkConf)
-//    val streamingContext: StreamingContext = new StreamingContext(sparkContext, Durations.seconds(DURATIONS_TIME))
-    
     val streamingContext = StreamingContext.getOrCreate(CHECKPOINT_DIR, functionToCreateContext _)
 
     val kafkaParams = Map[String, Object](
