@@ -23,11 +23,23 @@ object SparkStreamingKafka {
   val GROUP_ID: String =  PropertiesUtil.getPropString("kafka.group.id") //    "urtc_bill_group"
   val DURATIONS_TIME: Long = 30 * 3;
   val SEPERATOR : String =  "|";
+  val CHECKPOINT_DIR = "rtc_bill_checkpoint"
 
-  def main(args:Array[String]) : Unit = {
+  def functionToCreateContext(): StreamingContext = {
     val _sparkConf: SparkConf = new SparkConf()
     val sparkContext: SparkContext = new SparkContext(_sparkConf)
-    val streamingContext: StreamingContext = new StreamingContext(sparkContext, Durations.seconds(DURATIONS_TIME))
+    val ssc: StreamingContext = new StreamingContext(sparkContext, Durations.seconds(DURATIONS_TIME))
+
+    ssc.checkpoint(CHECKPOINT_DIR)   // set checkpoint directory
+    ssc
+  }
+
+  def main(args:Array[String]) : Unit = {
+//    val _sparkConf: SparkConf = new SparkConf()
+//    val sparkContext: SparkContext = new SparkContext(_sparkConf)
+//    val streamingContext: StreamingContext = new StreamingContext(sparkContext, Durations.seconds(DURATIONS_TIME))
+    
+    val streamingContext = StreamingContext.getOrCreate(CHECKPOINT_DIR, functionToCreateContext _)
 
     val kafkaParams = Map[String, Object](
       "bootstrap.servers" -> BOOTSTRAP_SERVERS,
