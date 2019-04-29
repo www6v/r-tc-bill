@@ -12,20 +12,19 @@ import org.apache.spark.streaming.{Durations, StreamingContext}
 import org.apache.spark.{TaskContext, SparkConf, SparkContext}
 import org.joda.time.DateTime
 import org.slf4j.{LoggerFactory, Logger}
-import ucloud.utrc.bill.mybatis.RtcBillDataAccess
 
+import ucloud.utrc.bill.mybatis.RtcBillDataAccess
 
 object SparkStreamingKafka {
   private val logger: Logger = LoggerFactory.getLogger(SparkStreamingKafka.getClass)
 
-  val BOOTSTRAP_SERVERS: String = "10.25.16.164:9092,10.25.22.115:9092,10.25.21.72:9092"
-  val TOPIC_NAME: String = "urtc_bill_log"
-  val GROUP_ID: String = "urtc_bill_group"
+  val BOOTSTRAP_SERVERS: String =  PropertiesUtil.getPropString("kafka.bootstrap.servers")  // "10.25.16.164:9092,10.25.22.115:9092,10.25.21.72:9092"
+  val TOPIC_NAME: String = PropertiesUtil.getPropString("kafka.topic")  // "urtc_bill_log"
+  val GROUP_ID: String =  PropertiesUtil.getPropString("kafka.group.id") //    "urtc_bill_group"
   val DURATIONS_TIME: Long = 30 * 3;
   val SEPERATOR : String =  "|";
 
   def main(args:Array[String]) : Unit = {
-
     val _sparkConf: SparkConf = new SparkConf()
     val sparkContext: SparkContext = new SparkContext(_sparkConf)
     val streamingContext: StreamingContext = new StreamingContext(sparkContext, Durations.seconds(DURATIONS_TIME))
@@ -85,23 +84,8 @@ object SparkStreamingKafka {
         }
       });
 
-
-//    val duplicatedRdd = filtedRdd.map( consumerRecord => {
-//      val consumerRecordLine = consumerRecord.value();
-//      val jsonObject = JSON.parseObject(consumerRecordLine)
-//
-//      val streamId = jsonObject.getString("streamId")
-//
-//      (consumerRecordLine, streamId)
-//    })
-
     val handlerdRdd = filtedRdd.map( consumerRecord => {
       val jsonObject = JSON.parseObject(consumerRecord.value())
-
-//      var appId = jsonObject.getOrDefault("appId",null)
-//      var userId = jsonObject.getOrDefault("userId",null)
-//      val roomId = jsonObject.getOrDefault("roomId",null)
-//      val streamId = jsonObject.getOrDefault("streamId",null)
 
       val appId = jsonObject.getString("appId")
       val userId = jsonObject.getString("userId")
