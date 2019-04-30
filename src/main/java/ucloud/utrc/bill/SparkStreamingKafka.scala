@@ -53,14 +53,6 @@ object SparkStreamingKafka {
       Subscribe[String, String](topics, kafkaParams)
     )
 
-    //     val offsetRanges = Array(
-    //       // topic, partition, inclusive starting offset, exclusive ending offset
-    //       OffsetRange("test", 0, 0, 100),
-    //       OffsetRange("test", 1, 0, 100)
-    //     )
-    //     org.apache.spark.streaming.kafka010.KafkaUtils.createRDD[String, String](sparkContext, kafkaParams, offsetRanges, PreferConsistent)
-    //     KafkaUtils.createRDD[String, String](javaSparkContext,  kafkaParams, offsetRanges, PreferConsistent);
-
     var offsetRanges: Array[OffsetRange] = Array.empty[OffsetRange]
     val filtedRdd = stream
       .transform(rdd => {
@@ -164,8 +156,7 @@ object SparkStreamingKafka {
               logger.info( "count: " + count)
               logger.info( "appId: " + appId)
               logger.info( "profile: " + profile)
-
-//              DbStore.insertDB(roomId, count)
+              
               RtcBillDataAccess.insertDB(appId, roomId, count, profile, endTime, startTime, videoCount, audioCount)
             }
           }
@@ -173,25 +164,6 @@ object SparkStreamingKafka {
 
       stream.asInstanceOf[CanCommitOffsets].commitAsync(offsetRanges)
     }
-
-
-//    stream.foreachRDD { rdd =>
-//      val offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
-//
-//      rdd.foreachPartition(consumerRecords => {
-//        if (consumerRecords.hasNext) {
-//          val next: ConsumerRecord[String, String] = consumerRecords.next
-//          val key: String = next.key
-//          val value: String = next.value
-//          if (value != null) {
-//            //            logger.info("value:" + value)
-//          }
-//          DbStore.insertDB(value, 345)
-//        }
-//      })
-//
-//      stream.asInstanceOf[CanCommitOffsets].commitAsync(offsetRanges)
-//    }
 
     try {
       streamingContext.start
