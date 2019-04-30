@@ -156,7 +156,7 @@ object SparkStreamingKafka {
               logger.info( "count: " + count)
               logger.info( "appId: " + appId)
               logger.info( "profile: " + profile)
-              
+
               RtcBillDataAccess.insertDB(appId, roomId, count, profile, endTime, startTime, videoCount, audioCount)
             }
           }
