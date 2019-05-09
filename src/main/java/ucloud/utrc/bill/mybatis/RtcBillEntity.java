@@ -1,4 +1,4 @@
-package ucld.rtc.bill.mybatis;
+package ucloud.utrc.bill.mybatis;
 
 import java.util.Date;
 

@@ -1,4 +1,4 @@
-package ucld.rtc.bill;
+package ucloud.utrc.bill;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

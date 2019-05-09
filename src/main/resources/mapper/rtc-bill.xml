@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="ucld.rtc.bill.mybatis.RtcBillMapper">
+<mapper namespace="ucloud.utrc.bill.mybatis.RtcBillMapper">
 
     <insert id="insertBill" parameterType="RtcBillEntity" >
        insert into rtc_bill(app_id, room_id, profile, count, end_time, start_time, video_count, audio_count)

@@ -6,7 +6,7 @@
     <properties resource="db-bill.properties"/>
 
     <typeAliases>
-        <typeAlias type="ucld.rtc.bill.mybatis.RtcBillEntity" alias="RtcBillEntity"/>
+        <typeAlias type="ucloud.utrc.bill.mybatis.RtcBillEntity" alias="RtcBillEntity"/>
 
         <!--<package name="com.xfishs.pojo" />-->
     </typeAliases>

@@ -1,4 +1,4 @@
-package ucld.rtc.bill.mybatis;
+package ucloud.utrc.bill.mybatis;
 
 public interface RtcBillMapper {
     RtcBillEntity selectBill(int i);
