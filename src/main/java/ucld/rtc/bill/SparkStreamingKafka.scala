@@ -1,4 +1,4 @@
-package ucloud.utrc.bill
+package ucld.rtc.bill
 
 import com.alibaba.fastjson.{JSONException, JSON}
 import org.apache.commons.lang3.StringUtils
@@ -12,8 +12,7 @@ import org.apache.spark.streaming.{Durations, StreamingContext}
 import org.apache.spark.{TaskContext, SparkConf, SparkContext}
 import org.joda.time.DateTime
 import org.slf4j.{LoggerFactory, Logger}
-
-import ucloud.utrc.bill.mybatis.RtcBillDataAccess
+import ucld.rtc.bill.mybatis.RtcBillDataAccess
 
 object SparkStreamingKafka {
   private val logger: Logger = LoggerFactory.getLogger(SparkStreamingKafka.getClass)

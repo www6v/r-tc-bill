@@ -1,4 +1,4 @@
-package ucloud.utrc.bill
+package ucld.rtc.bill
 
 import java.util.Properties
 
