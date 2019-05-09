@@ -22,7 +22,7 @@ object SparkStreamingKafka {
   val BOOTSTRAP_SERVERS: String =  PropertiesUtil.getPropString("kafka.bootstrap.servers")
   val TOPIC_NAME: String = PropertiesUtil.getPropString("kafka.topic")
   val GROUP_ID: String =  PropertiesUtil.getPropString("kafka.group.id")
-  val DURATIONS_TIME: Long = 30 * 3;
+  val DURATIONS_TIME: Long = 60 * 5; // 30 * 3
   val SEPERATOR : String =  "|";
   val CHECKPOINT_DIR = "rtc_bill_checkpoint"
 
