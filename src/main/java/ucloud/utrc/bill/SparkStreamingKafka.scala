@@ -34,7 +34,11 @@ object SparkStreamingKafka {
   }
 
   def main(args:Array[String]) : Unit = {
-    val streamingContext = StreamingContext.getOrCreate(CHECKPOINT_DIR, functionToCreateContext _)
+//    val streamingContext = StreamingContext.getOrCreate(CHECKPOINT_DIR, functionToCreateContext _)
+
+    val _sparkConf: SparkConf = new SparkConf()
+    val sparkContext: SparkContext = new SparkContext(_sparkConf)
+    val streamingContext: StreamingContext = new StreamingContext(sparkContext, Durations.seconds(DURATIONS_TIME))
 
     val kafkaParams = Map[String, Object](
       "bootstrap.servers" -> BOOTSTRAP_SERVERS,
