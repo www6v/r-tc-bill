@@ -1,5 +1,7 @@
 package ucloud.utrc.bill
 
+import java.util.Date
+
 import com.alibaba.fastjson.{JSONException, JSON}
 import org.apache.commons.lang3.StringUtils
 import org.apache.kafka.clients.consumer.ConsumerRecord
@@ -135,6 +137,7 @@ object SparkStreamingKafka {
       ))
 
     rddAgg.foreachRDD { rdd =>
+      val date = new Date();
 
       rdd.foreachPartition { pair=> {
             val itor = pair.toIterator
@@ -160,7 +163,7 @@ object SparkStreamingKafka {
               logger.info( "appId: " + appId)
               logger.info( "profile: " + profile)
 
-              RtcBillDataAccess.insertDB(appId, roomId, count, profile, endTime, startTime, videoCount, audioCount)
+              RtcBillDataAccess.insertDB(appId, roomId, count, profile, endTime, startTime, videoCount, audioCount, date)
             }
           }
       }
