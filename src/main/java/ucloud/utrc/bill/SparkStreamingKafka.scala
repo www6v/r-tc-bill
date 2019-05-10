@@ -2,7 +2,7 @@ package ucloud.utrc.bill
 
 import java.util.Date
 
-import com.alibaba.fastjson.{JSONException, JSON}
+import com.alibaba.fastjson.{JSONObject, JSONException, JSON}
 import org.apache.commons.lang3.StringUtils
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -14,6 +14,8 @@ import org.apache.spark.streaming.{Durations, StreamingContext}
 import org.apache.spark.{TaskContext, SparkConf, SparkContext}
 import org.joda.time.DateTime
 import org.slf4j.{LoggerFactory, Logger}
+import org.springframework.http.{HttpEntity, MediaType, HttpHeaders}
+import org.springframework.web.client.RestTemplate
 import ucloud.utrc.bill.mybatis.RtcBillDataAccess
 
 object SparkStreamingKafka {
@@ -139,6 +141,13 @@ object SparkStreamingKafka {
     rddAgg.foreachRDD { rdd =>
       val date = new Date();
 
+      val restTemplate: RestTemplate = new RestTemplate
+      val headers: HttpHeaders = new HttpHeaders
+      val contentType: MediaType = MediaType.parseMediaType("application/json; charset=UTF-8")
+      headers.setContentType(contentType)
+      headers.add("Accept", MediaType.APPLICATION_JSON.toString)
+      val ts: java.util.List[Bill] = new java.util.ArrayList[Bill]
+
       rdd.foreachPartition { pair=> {
             val itor = pair.toIterator
             while(itor.hasNext) {
@@ -163,10 +172,25 @@ object SparkStreamingKafka {
               logger.info( "appId: " + appId)
               logger.info( "profile: " + profile)
 
+              val bill: Bill = new Bill
+              bill.setEndpoint(appId)
+              bill.setMetric(profile)
+              bill.setTimestamp(new Date().getTime)
+              bill.setStep(60*5)
+              bill.setValue(count.toLong)
+              bill.setCounterType("GAUGE")
+              bill.setTags("roomId=" + roomId)
+
+              ts.add(bill)
+
               RtcBillDataAccess.insertDB(appId, roomId, count, profile, endTime, startTime, videoCount, audioCount, date)
             }
           }
       }
+
+      val formEntity: HttpEntity[String] = new HttpEntity[String](JSON.toJSONString(ts), headers)
+      val body: JSONObject = restTemplate.postForEntity("http://10.25.27.40:1988/v1/push", formEntity, classOf[JSONObject]).getBody
+      logger.info( "body is: " + body.toString)
 
       stream.asInstanceOf[CanCommitOffsets].commitAsync(offsetRanges)
     }
