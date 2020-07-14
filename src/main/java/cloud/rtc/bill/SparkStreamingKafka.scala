@@ -1,4 +1,4 @@
-package ucloud.utrc.bill
+package cloud.rtc.bill
 
 import java.util.Date
 

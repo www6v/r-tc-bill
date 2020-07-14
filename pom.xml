@@ -15,12 +15,12 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>urtc</groupId>
+  <groupId>r-tc</groupId>
   <artifactId>bill</artifactId>
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>urtc-bill</name>
+  <name>rtc-bill</name>
 
   <properties>
     <!--<spark.version>2.2.0</spark.version>-->

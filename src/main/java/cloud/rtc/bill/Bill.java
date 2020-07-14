@@ -1,4 +1,4 @@
-package ucloud.utrc.bill;
+package cloud.rtc.bill;
 
 /**
  * Created by www6v on 2019/5/10.
